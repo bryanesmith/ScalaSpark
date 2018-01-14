@@ -1,7 +1,9 @@
-package com.bryanesmith.spark
+package com.bryanesmith.spark.section1
 
 import org.apache.log4j._
 import org.apache.spark._
+
+import scala.io.Source
 
 /** Count up how many of each star rating exists in the MovieLens 100K data set. */
 object RatingsCounter {
@@ -17,7 +19,7 @@ object RatingsCounter {
     // Format: userID, movieID, rating, timestamp
     def extractRating(line:String) = line.split("\t")(2)
 
-    sc.textFile("ml-100k/u.data")
+    sc.textFile(getClass.getResource("/section1/ml-100k/u.data").getFile)
       .map(extractRating)
       .countByValue
       .toSeq
