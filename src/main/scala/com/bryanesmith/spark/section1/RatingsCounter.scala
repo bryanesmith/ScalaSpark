@@ -9,8 +9,7 @@ object RatingsCounter {
 
   // Format: userID, movieID, rating, timestamp
   private def extractRating(line:String) = line.split("\t")(2)
- 
-  /** Our main function where the action happens */
+
   def main(args: Array[String]) {
 
     Logger.getLogger("org").setLevel(Level.ERROR)
