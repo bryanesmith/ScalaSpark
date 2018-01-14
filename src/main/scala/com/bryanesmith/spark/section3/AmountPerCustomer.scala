@@ -1,9 +1,8 @@
 package com.bryanesmith.spark.section3
 
+import com.bryanesmith.spark.SparkContextExtras._
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
-
-import com.bryanesmith.spark.SparkContextExtras._
 
 object AmountPerCustomer {
 
@@ -16,7 +15,7 @@ object AmountPerCustomer {
   def main(args: Array[String]): Unit = {
     Logger.getLogger("org").setLevel(Level.ERROR)
 
-    val sc = new SparkContext("local", getClass.getSimpleName)
+    val sc = new SparkContext("local[*]", getClass.getSimpleName)
 
     sc.resourceTextFile("/section3/customer-orders.csv")
       .map(parse)                 // [ (customer, amount) ]
