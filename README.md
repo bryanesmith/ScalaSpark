@@ -6,7 +6,9 @@ My [notes](https://github.com/bryanesmith/notes/tree/master/Apache%20Spark%202.0
 
 ## Setup
 
-I'm using Intellij; however, I exclude project files.
+Section 1 of my linked notes distill instructor's instructions on setup.
+
+Note that while I'm using Intellij, I exclude project files from this repo. You are responsible for choosing and setting up your IDE.
 
 Make sure you set `src/resources` as your resources root.
 
