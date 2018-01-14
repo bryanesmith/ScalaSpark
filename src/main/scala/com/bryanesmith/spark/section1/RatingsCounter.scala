@@ -2,11 +2,13 @@ package com.bryanesmith.spark.section1
 
 import org.apache.log4j._
 import org.apache.spark._
-
-import scala.io.Source
+import com.bryanesmith.spark.SparkContextExtras._
 
 /** Count up how many of each star rating exists in the MovieLens 100K data set. */
 object RatingsCounter {
+
+  // Format: userID, movieID, rating, timestamp
+  private def extractRating(line:String) = line.split("\t")(2)
  
   /** Our main function where the action happens */
   def main(args: Array[String]) {
@@ -16,10 +18,7 @@ object RatingsCounter {
     // Create a SparkContext using every core of the local machine, named RatingsCounter
     val sc = new SparkContext("local[*]", "RatingsCounter")
 
-    // Format: userID, movieID, rating, timestamp
-    def extractRating(line:String) = line.split("\t")(2)
-
-    sc.textFile(getClass.getResource("/section1/ml-100k/u.data").getFile)
+    sc.resourceTextFile("/section1/ml-100k/u.data")
       .map(extractRating)
       .countByValue
       .toSeq
