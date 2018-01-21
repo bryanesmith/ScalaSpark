@@ -11,6 +11,6 @@ object SparkContextExtras {
       * Helper method to call `textFile` on a resource file.
       */
     def resourceTextFile(resourcePath : String) : RDD[String] =
-      sc.textFile(this.getClass.getResource(resourcePath).getFile)
+      sc.textFile(IOUtils.resourceFilePath(resourcePath))
   }
 }
