@@ -109,36 +109,18 @@ object MovieSimilarities1M {
     val nameDict = loadMovieNames()
 
     // Change this to something like: s3n://my-bucket/ml-1m/ratings.dat
-    val data = sc.textFile("ratings.dat")
+    val ratings = sc.textFile("ratings.dat")
+      .map { l =>                             // stage 0, 1
+        val tokens = l.split("::")
+        (tokens(0).toInt, (tokens(1).toInt, tokens(2).toDouble))
+      }
 
-    // Map ratings to key / value pairs: user ID => movie ID, rating
-    val ratings = data.map(l => l.split("::")).map(l => (l(0).toInt, (l(1).toInt, l(2).toDouble)))
-    
-    // Emit every movie rated together by the same user.
-    // Self-join to find every combination.
-    val joinedRatings = ratings.join(ratings)   
-    
-    // At this point our RDD consists of userID => ((movieID, rating), (movieID, rating))
-
-    // Filter out duplicate pairs
-    val uniqueJoinedRatings = joinedRatings.filter(filterDuplicates)
-
-    // Now key by (movie1, movie2) pairs.
-    val moviePairs = uniqueJoinedRatings.map(makePairs).partitionBy(new HashPartitioner(100))
-
-    // We now have (movie1, movie2) => (rating1, rating2)
-    // Now collect all ratings for each movie pair and compute similarity
-    val moviePairRatings = moviePairs.groupByKey()
-
-    // We now have (movie1, movie2) = > (rating1, rating2), (rating1, rating2) ...
-    // Can now compute similarities.
-    val moviePairSimilarities = moviePairRatings.mapValues(computeCosineSimilarity).cache()
-    
-    //Save the results if desired
-    //val sorted = moviePairSimilarities.sortByKey()
-    //sorted.saveAsTextFile("movie-sims")
-    
-    // Extract similarities for the movie we care about that are "good".
+    val data = ratings.join(ratings)          // stage 2
+      .filter(filterDuplicates)
+      .partitionBy(new HashPartitioner(100))  // stage 3
+      .map(makePairs)
+      .groupByKey()                           // stage 4
+      .mapValues(computeCosineSimilarity).cache()
     
     if (args.length > 0) {
       val scoreThreshold = 0.97
@@ -149,7 +131,7 @@ object MovieSimilarities1M {
       // Filter for movies with this sim that are "good" as defined by
       // our quality thresholds above     
       
-      val filteredResults = moviePairSimilarities.filter( x =>
+      val filteredResults = data.filter( x =>
         {
           val pair = x._1
           val sim = x._2
