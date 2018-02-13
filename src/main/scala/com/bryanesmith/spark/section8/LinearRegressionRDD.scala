@@ -31,9 +31,18 @@ object LinearRegressionRDD {
       .setUpdater(new SquaredL2Updater())
       .setRegParam(0.01)
 
-    algorithm.run(trainingData)
+    val pairs = algorithm.run(trainingData)
       .predict(testData.map { _.features })
       .zip(testData.map { _.label })
-      .foreach(println)
+      .collect
+
+    pairs foreach println
+
+    val error = (1.0 / pairs.length) * pairs.foldLeft(0.0) { (sum, next) =>
+      Math.pow(next._1 - next._2, 2)
+    }
+
+    println
+    println(s"mean squared error: $error (pairs: ${pairs.length})")
   }
 }
