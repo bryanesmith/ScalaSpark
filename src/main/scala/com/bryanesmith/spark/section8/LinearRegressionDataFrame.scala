@@ -33,7 +33,7 @@ object LinearRegressionDataFrame {
       .setMaxIter(100)
       .setTol(1E-6)
       .fit(trainTest(0))
-      .transform(trainTest(1)).cache()
+      .transform(trainTest(1)).cache
       .select("prediction", "label").rdd
       .map { x => (x.getDouble(0), x.getDouble(1)) }
       .collect
@@ -47,6 +47,6 @@ object LinearRegressionDataFrame {
     println
     println(s"mean squared error: $error (pairs: ${pairs.length})")
 
-    spark.stop()
+    spark.stop
   }
 }
