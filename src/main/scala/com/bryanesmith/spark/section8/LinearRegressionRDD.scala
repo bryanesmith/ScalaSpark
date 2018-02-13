@@ -20,7 +20,7 @@ object LinearRegressionRDD {
       .randomSplit(Array(0.8, 0.2))
 
     val trainingData = allData(0)
-      .map(LabeledPoint.parse).cache()
+      .map(LabeledPoint.parse).cache
 
     val testData = allData(1).map(LabeledPoint.parse)
 
@@ -39,7 +39,7 @@ object LinearRegressionRDD {
     pairs foreach println
 
     val error = (1.0 / pairs.length) * pairs.foldLeft(0.0) { (sum, next) =>
-      Math.pow(next._1 - next._2, 2)
+      sum + Math.pow(next._1 - next._2, 2)
     }
 
     println
