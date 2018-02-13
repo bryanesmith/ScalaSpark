@@ -27,7 +27,7 @@ object LinearRegressionDataFrame {
     val trainTest = data.toDF("label", "features")
       .randomSplit(Array(0.8, 0.2))
 
-    new LinearRegression()
+    val pairs = new LinearRegression()
       .setRegParam(0.3)
       .setElasticNetParam(0.8)
       .setMaxIter(100)
@@ -36,7 +36,16 @@ object LinearRegressionDataFrame {
       .transform(trainTest(1)).cache()
       .select("prediction", "label").rdd
       .map { x => (x.getDouble(0), x.getDouble(1)) }
-      .foreach(println)
+      .collect
+
+    pairs foreach println
+
+    val error = (1.0 / pairs.length) * pairs.foldLeft(0.0) { (sum, next) =>
+      sum + Math.pow(next._1 - next._2, 2)
+    }
+
+    println
+    println(s"mean squared error: $error (pairs: ${pairs.length})")
 
     spark.stop()
   }
